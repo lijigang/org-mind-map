@@ -343,6 +343,13 @@ defined in `org-mind-map-node-formats'."
 	    (if colspan (concat " colspan=\"" (int-to-string colspan) "\""))
 	    (if color (concat " bgcolor=\"" color "\"")) ">" tag "</td>")))
 
+(defcustom org-mind-map-display-legend nil
+  "A boolean indicating whether to display the legend in the graph.
+   default = nil"
+  :type 'boolean
+  :group 'org-mind-map
+  )
+
 (defun org-mind-map-write-tags-default (title tags color hm el &optional content images)
   "Default function for writing nodes.
 Label node with TITLE and background COLOR, and write TAGS (a list of tag names)
@@ -363,8 +370,7 @@ The EL argument is not used, but is needed for compatibility."
 	    )
 
 	  (if (> (length images) 0)
-	      images ""
-	    )
+	      images "")
 	  "</table>>];"))
 
 (defun org-mind-map-get-property (prop el &optional inheritp)
@@ -473,7 +479,7 @@ Then, formats the titles and tags so as to be usable within DOT's graphviz langu
       (let* ((org-link-search-inhibit-query t)
 	     (type (org-element-property :type e))
              (l (org-element-property :path e)))
-	(if (string= type "fuzzy")
+	(if (or (string= type "fuzzy") (string= type "node"))
 	    (save-excursion
 	      (org-link-search l) t)
 	  nil))
@@ -605,7 +611,9 @@ If LINKSP is non-nil include graph edges for org links."
 					     (org-mind-map-dot-node-name (nth 1 x))
 					     (nth 2 x)))
 		       table "\n")
-	    (org-mind-map-make-legend legend)
+	    (if org-mind-map-display-legend
+                (org-mind-map-make-legend legend)
+              "")
 	    "}")))
 
 (defun org-mind-map-command (name outputtype)
